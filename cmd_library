@@ -1,0 +1,16 @@
+to run server:
+python3 manage.py runsever
+/////////////////////////////
+to create app:
+python3 manage.py startapp priject_name
+//////////////////////////////////
+to start:
+django-admin startproject myproject
+////////////////////////////////////
+Функция принимает объект запроса в качестве первого аргумента, имя шаблона в качестве второго аргумента, и словаря в качестве дополнительного третьего аргумента:
+def home(request):
+  context = {"name": "Spot"}
+  return render(request, "vetoffice/home.html", context)
+////////////////////////////////////////////////////////////////////////////
+
+python3 manage.py migrate

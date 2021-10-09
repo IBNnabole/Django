@@ -1,0 +1,105 @@
+home.html: - это дом стр
+
+{% extends 'vetoffice/base.html' %} - подключаем шаблон 1)папка проекта в которой темплейтс, а 2-е - нужный нам файл
+{% load static %} - загружаем папку статик с цсс файлами и тд
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'vetoffice/style.css' %}">
+{% endblock %}
+блоки контента. В верхнем цсс, а в нижнем строка, которая изменит стиль в соответствии с цсс.
+{% block content %}
+<p>Welcome!</p>
+{% endblock %}
+///////////////////////////////////////////////////////////////////////////////////////////////
+base.html: Это шаблон страниц, здесь надо создать спец блоки, чтобы на других стр можно было добавлять какие-то элементы к шаблону
+
+<!DOCTYPE html>
+<head>
+  {% block head %}
+  {% endblock %}
+</head>
+
+<body>
+  <h1>Welcome to Vet Office!</h1>
+  {% block content %}
+  {% endblock %}
+</body>
+////////////////////////////////////////////////////////////////////////////////////////
+if/elif/else construction:
+
+{% if city.name == "New York" %} - Начинаем иф
+  <p>Attractions for New York City are</p>
+  ...
+{% elif city.name == "Los Angeles" %}
+  <p>Attractions for Los Angeles are</p>
+  ...
+{% else %}
+  <p>We currently do not have any attractions for that city</p>
+{% endif %} - печатаем это, чтобы закрыть условия
+///////////////////////////////////////////////////////////////////////////////////////////
+Loop in dj
+
+{% for item in list_name %}
+  <p>{{ item }}</p>
+{% endfor %}
+//
+{% for key, value in dictionary_list %}
+  <p>{{ key }} : {{ value }}</p>
+{% endfor %}
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+part of one program:
+
+{% extends 'vetoffice/base.html' %}
+{% load static %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'vetoffice/style.css' %}">
+{% endblock %}
+
+{% block content %}
+<p>Welcome, {{ name }}!</p>
+<p>Here is the current list of patients:</p>
+  <!-- Put the loop below here! -->
+  {% for pet in pets %}
+    <p>{{pet.petname}}:{{pet.animal_type}}</p>
+  {% endfor %}
+{% endblock %}
+/////////////////////////////////////////////////////////////////////////////////////////////////
+Добавление URL-адресов в шаблон:
+
+<a href="{% url 'path_name' %}">Sample link</a>
+<a href="{% url 'path_name' username %}">User Profile</a>
+<a href="{% url 'home' %}">Vet Office</a> <--- home - home.html однако стоит только указать его название. Путь не надо.
+////////////////////////////////////////////////////////////////////////////////////////////////////
+Фильтр добавляется к переменной с помощью |символа внутри тегов переменных с переменной.
+
+<p>{{ username|upper }}</p>
+{{ description|truncatewords_html:2 }} - truncatewords_html Фильтр требует аргумента и сократить текст до целого числа (2).
+Например, time фильтру требуется переменная типа данных datetime.datetime.Now()
+<p>{{ name|lower }}</p>
+{% for key in pets|dictsort:"petname" %}
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+How to create db:
+
+from django.db import models
+
+class Owner(models.Model):
+
+  first_name = models.CharField(max_length = 30)
+  last_name = models.CharField(max_length = 30)
+  phone = models.CharField(max_length = 30)
+
+class Patient(models.Model):
+
+  breed = models.CharField(max_length = 200)
+  pet_name = models.CharField(max_length = 200)
+  age = models.IntegerField(default = 0)
+ 
+ link to remember types: https://docs.djangoproject.com/en/3.1/ref/models/fields/#model-field-types
+ ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+

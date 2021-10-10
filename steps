@@ -85,19 +85,154 @@ How to create db:
 from django.db import models
 
 class Owner(models.Model):
+  first_name = models.CharField(max_length=30)
+  last_name = models.CharField(max_length=30)
+  phone = models.CharField(max_length=30)
+  
+  def __str__(self):
+    return self.first_name + " " + self.last_name
 
-  first_name = models.CharField(max_length = 30)
-  last_name = models.CharField(max_length = 30)
-  phone = models.CharField(max_length = 30)
+  def has_multiple_pets(self):
+    return self.patient_set.count() > 1
+
 
 class Patient(models.Model):
+  DOG = "DO"
+  CAT = "CA"
+  BIRD = "BI"
+  REPTILE = "RE"
+  OTHER = "OT"
+  ANIMAL_TYPE_CHOICES = [
+    (DOG, "Dog"),
+    (CAT, "Cat"),
+    (BIRD, "Bird"),
+    (REPTILE, "Reptile"),
+    (OTHER, "Other"),
+  ]
+  animal_type = models.CharField(max_length=2, choices=ANIMAL_TYPE_CHOICES, default=OTHER)
+  breed = models.CharField(max_length=200)
+  pet_name = models.CharField(max_length=200)
+  age = models.IntegerField(default=0)
+  owner = models.ForeignKey(Owner, on_delete=models.CASCADE)
+  
+  def __str__(self):
+    return self.pet_name + ", " + self.animal_type
 
-  breed = models.CharField(max_length = 200)
-  pet_name = models.CharField(max_length = 200)
-  age = models.IntegerField(default = 0)
+  class Meta:
+    ordering = ["pet_name"]
  
  link to remember types: https://docs.djangoproject.com/en/3.1/ref/models/fields/#model-field-types
+ To args: https://docs.djangoproject.com/en/3.1/ref/models/fields/#arguments
+ Field-options: https://docs.djangoproject.com/en/3.1/topics/db/models/#field-options
  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+To create:
+
+python3 manage.py shell
+from vetoffice.models import Owner -- from app_name.models import ModelName
+owner_instance=Post(title="New", description="My Post")
+owner_instance.save()
+///////////
+To read:
+
+python3 manage.py shell
+from vetoffice.models import Owner
+every_instance = ModelName.objects.all()
+every_instance[0]
+first_instance = ModelName.objects.first()
+//////////
+To update:
+
+python3 manage.py shell
+from vetoffice.models import Owner
+first_owner = Owner.objects.first()
+first_owner.first_name
+first_owner.first_name = "Khadaza"
+first_owner.save()
+first_owner.first_name
+////////////
+To delete:
+
+python3 manage.py shell
+from vetoffice.models import Owner
+first_owner = Owner.objects.first()
+first_owner
+first_owner.delete()
+Owner.objects.all()
+///////////
+.get(): - give us an objects which we want
+
+python3 manage.py shell
+from vetoffice.models import Owner
+>>> unique_instance = ModelName.objects.get(name="Ruqisa")
+>>> unique_instance
+<ModelName: ModelName object (10)>
+
+object_match = Owner.objects.get(last_name="Uddin")
+In [3]: object_match
+Out[3]: <Owner: Mia Uddin>
+
+.get_or_create():
+
+python3 manage.py shell
+from vetoffice.models import Owner
+>>> wanted_object = ModelName.objects.get_or_create(title="example", content="jango")
+>>> wanted_object
+(<ModelName: ModelName object (15)>, True) - (true means that we dont have this object, but now we create it. If value will be false, we will nown that we have this object in base)
+
+some_object = Owner.objects.get_or_create(first_name="Elon", last_name="Musk", phone="344-555-1234")
+In [5]: some_object
+Out[5]: (<Owner: Elon Musk>, True)
+////////////////
+.exclude() - give us all objects without which we choose
+
+python3 manage.py shell
+from vetoffice.models import Owner
+>>> not_trucks = ModelName.objects.exclude(title="truck")
+not_included = Owner.objects.exclude(first_name="Elon")
+not_included
+Out[5]: <QuerySet [<Owner: Mia Uddin>, <Owner: Vint Kahn>]>
+/////////////////
+.order_by() - sort objects
+
+python3 manage.py shell
+from vetoffice.models import Owner
+>>> ordered_by_id = modelName.objects.order_by("-pk") ("pk"первичному ключу)
+descending_order = Owner.objects.order_by("-pk")
+descending_order
+Out[3]: <QuerySet [<Owner: Elon Musk>, <Owner: Vint Kahn>, <Owner: Mia Uddin>]>
+////////////////
+.filter() - метод для поиска каждого экземпляра
+
+python3 manage.py shell
+from vetoffice.models import Owner, Patient
+>>> question_instance = Question.objects.get(question="Is blue a color?") 
+>>> Answer.objects.filter(question=question_instance) <--
+<QuerySet [<Answer: No>, <Answer: Yes>, <Answer: It is a number>]>
+first_owner = Owner.objects.first()
+Patient.objects.filter(owner=first_owner)
+Out[3]: <QuerySet [<Patient: Bucky, DO>, <Patient: Hammond, DO>, <Patient: Leo, CA>]>
+
+to filter by ID, we use (_id)
+
+python3 manage.py shell
+from vetoffice.models import Owner, Patient
+>>> Answer.objects.filter(question_id=3)
+<QuerySet [<Answer: It is a number>]>
+//////////////
+Обратная связь - это способ запроса двух таблиц с использованием модели, не содержащей внешнего ключа, с помощью (_set)
+(_set) <------------------important
+сначала вводим по кому мы что-то ищем, затем берем где мы ищем и добавляем туда (_set), ну а дальше допустим all. Эта \функция\ делает примерно тоже самое
+
+python3 manage.py shell
+from vetoffice.models import Owner, Patient
+first_owner = Owner.objects.first()
+first_owner.patient_set.all()
+Out[3]: <QuerySet [<Patient: Bucky, DO>, <Patient: Hammond, DO>, <Patient: Leo, CA>]>
+
+
+
+
+
 
 
 

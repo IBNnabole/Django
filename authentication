@@ -1,0 +1,129 @@
+first we have to create a superuser.
+
+-python3 manage.py createsuperuser
+
+for users in consloe:
+from django.contrib.auth.models import User
+user = User.objects.create_user(username="myusername", email="myemail@crazymail.com", passsword="mypassword")
+
+text in admin.py:
+# myapp_root/book_catalog/admin.py
+ 
+from .models import Book
+ 
+admin.site.register(Book)
+
+
+in views.py to authenticate:
+
+
+from django.contrib.auth import authenticate, login
+from django.shortcuts import redirect
+ 
+def login_view(request):
+  username = request.POST["username"]
+  password = request.POST["password"]
+ 
+  user =  authenticate(request, username=username, password=password)
+ 
+  # Check if a user is verified and authenticated
+  if user is not None:
+    # Use the returned user object in login()
+    login(request, user)
+ 
+    # Redirect to home page after logging in
+    return redirect("home.html")
+  else:
+    render(request, "registration/login.html", context)
+
+Для отображения имени на стр имени
+def home(request):
+   context = {"name": request.user }
+   return render(request, "vetoffice/home.html", context)
+
+OTHER WAY:
+
+from django.contrib.auth.mixins import LoginRequiredMixin
+class SomeView(LoginRequiredMixin, ListView):
+  model = ModelExample
+  
+ decorator:
+ 
+ from django.contrib.auth.decorators import login_required
+ 
+@login_required
+def profile(request):
+  return render(request, "app/profile.html", name="profile")
+  ////////////////////////////////
+Logout:
+
+from django.contrib.auth import logout
+def logout_view(request):
+  logout(request)
+  return redirect("home")
+  
+ then in urls.py u have to create a page, this might be an example:
+ 
+ 
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'vetoffice/style.css' %}">
+
+<h2>Please login</h2>
+<form class="login" method="post">
+  <div>
+    {% csrf_token %}
+    <!-- Add your form.as_p method below -->
+    {{ form.as_p }}
+    <input type="submit" value="Login"/>
+  </div>
+</form>
+
+registration:
+
+# views.py
+from django.contrib.auth.forms import UserCreationForm
+from django.urls import reverse_lazy
+ 
+class SignUp(CreateView):
+  form_class = UserCreationForm
+  success_url = reverse_lazy("login")
+  template_name = "registration/signup.html"
+
+# urls.py
+ path("signup/", views.SignUp.as_view(), name="signup"),
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
